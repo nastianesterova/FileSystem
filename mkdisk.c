@@ -4,6 +4,7 @@
 
 //create a disk (MYFS) in dev/shm
 int main() {
-    pdos_mkdisk(10);
-    return 0;
+	printf("Making disk\n");
+	pdos_mkdisk(10);
+	return 0;
 }
