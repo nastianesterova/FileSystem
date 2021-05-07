@@ -19,8 +19,12 @@ $(OBJ_DIR):
 $(LIB_DIR):
 	@mkdir -p $(LIB_DIR)
 
+test_programs = mkdisk
+
+all_tests: $(test_programs)
+
 mkdisk: test_src/mkdisk.c $(LIB_DIR)/libPseudoFS.a
 	gcc $(C_FLAGS) -I. -o mkdisk test_src/mkdisk.c $(LIB_DIR)/libPseudoFS.a
 
 clean:
-	rm $(OBJ_DIR)/*.o $(LIB_DIR)/*.a
+	rm $(OBJ_DIR)/*.o $(LIB_DIR)/*.a $(test_programs)
