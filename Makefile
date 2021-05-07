@@ -1,33 +1,22 @@
-all: pdos_mkdisk pdos_mkfs pdos_open pdos_fgetc pdos_fputc pdos_fclose pdos_dir pdos_mkdir link
+OBJ_DIR=./obj
+LIB_DIR=./lib
 
-pdos_mkdisk:
-	gcc -c pdos_mkdisk.c -o pdos_mkdisk.o
+tempdirs = $(OBJ_DIR) $(LIB_DIR)
 
-pdos_mkfs:
-	gcc -c pdos_mkfs.c -o pdos_mkfs.o
+lib_c_files = pdos_fgetc.c pdos_fputc.c pdos_mkdisk.c pdos_mkfs.c pdos_open.c pdos_fclose.c pdos_dir.c pdos_mkdir.c
+lib_obj_files = $(patsubst %.c,$(OBJ_DIR)/%.o,$(lib_c_files))
 
-pdos_open:
-	gcc -c pdos_open.c -o pdos_open.o
+$(OBJ_DIR)/%.o: %.c
+	gcc -c -std=c11 -Wall -DXOPEN_SOURCE=700 -o $@ $<
 
-pdos_fgetc:
-	gcc -c pdos_fgetc.c -o pdos_fgetc.o
+$(LIB_DIR)/libPseudoFS.a: $(lib_obj_files)
+	ar rc -s $(LIB_DIR)/libPseudoFS.a $(lib_obj_files)
 
-pdos_fputc:
-	gcc -c pdos_fputc.c -o pdos_fputc.o
+$(OBJ_DIR): 
+	@mkdir -p $(OBJ_DIR)
 
-pdos_fclose:
-	gcc -c pdos_fclose.c -o pdos_fclose.o
-
-pdos_dir:
-	gcc -c pdos_dir.c -o pdos_dir.o
-
-pdos_mkdir:
-	gcc -c pdos_mkdir.c -o pdos_mkdir.o
-link:
-	ar rcu libPseudoFS.a pdos_fgetc.o pdos_fputc.o pdos_mkdisk.o pdos_mkfs.o pdos_open.o pdos_fclose.o pdos_dir.o pdos_mkdir.o
-
+$(LIB_DIR):
+	@mkdir -p $(LIB_DIR)
 
 clean:
-	rm libPseudoFS.a pdos_mkdisk.o pdos_mkfs.o pdos_open.o pdos_fgetc.o pdos_fputc.o pdos_fclose.o pdos_dir.o pdos_mkdir.o
-
-
+	rm $(OBJ_DIR)/*.o $(LIB_DIR)/*.a
