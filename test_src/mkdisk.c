@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "pdos.h"
+#include "/home/cosc255/FINAL/pdos.h"
 
 //create a disk (MYFS) in dev/shm
 int main() {
