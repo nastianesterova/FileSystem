@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include "pdosfilesys.h"
 
@@ -9,5 +8,5 @@ void pdos_mkdisk(int sz) {
 		printf("File failed to open.\n");
 		exit(-1);	
 	}	
-	ftruncate(fd, sz);	
+	ftruncate(fd, sz);
 }
