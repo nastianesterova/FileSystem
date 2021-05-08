@@ -1,6 +1,6 @@
 #compile test code by hand/manually
 #gcc -g -std=c11 -Wall -o mkdisk test_src/mkdisk.c -L./lib -lPseudoFS -lrt
-#need to properly link library
+#need to link librt, realtime extensions library, to the executable
 
 OBJ_DIR = ./obj
 LIB_DIR = ./lib
@@ -28,7 +28,7 @@ test_programs = mkdisk
 all_tests: $(test_programs)
 
 mkdisk: test_src/mkdisk.c $(LIB_DIR)/libPseudoFS.a
-	gcc $(C_FLAGS) -I. -o mkdisk test_src/mkdisk.c -L$(LIB_DIR) -lPseudoFS -lrt
+	gcc $(C_FLAGS) -I. -o mkdisk test_src/mkdisk.c $(LIB_DIR)/libPseudoFS.a -lrt
 
 clean:
 	rm $(OBJ_DIR)/*.o $(LIB_DIR)/*.a $(test_programs)
