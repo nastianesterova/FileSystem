@@ -11,24 +11,34 @@
 DISK_BLOCK* pdos_fs = 0;
 
 void pdos_mkfs(char * ID) {
-    DISK_BLOCK* blocks = _pdos_open_fs();
+    _pdos_open_fs();
+
     // initialize reserved block with ID string, offset of 8 bytes
-    strcpy(&blocks[0].data[8], ID); 
+    DISK_BLOCK block;
+    memset(&block, 0, sizeof(DISK_BLOCK));
+    strcpy(&block.data[8], ID);
+    _pdos_write_block(&block, 0);
+
     // fill the FAT blocks
     //TODO: look over
-    blocks[1].fat[0] = 0;
-    blocks[1].fat[1] = 2;
-    blocks[1].fat[2] = 0;
-    blocks[1].fat[3] = 0;
+    block.fat[0] = 0;
+    block.fat[1] = 2;
+    block.fat[2] = 0;
+    block.fat[3] = 0;
     for(int i = 4; i < BLOCK_SIZE / 2; i++) {
-        blocks[1].fat[i] = -1;
+        block.fat[i] = -1;
     }
+    _pdos_write_block(&block, 1);
     for(int i = 0; i < BLOCK_SIZE / 2; i++) {
-        blocks[2].fat[i] = -1;
+        block.fat[i] = -1;
     }
+    _pdos_write_block(&block, 2);
+
     // initialize directory block
-    blocks[3].dir.isdir = 1;
-    blocks[3].dir.nextEntry = 0;
+    memset(&block, 0, sizeof(DISK_BLOCK));
+    block.dir.isdir = 1;
+    block.dir.nextEntry = 0;
+    _pdos_write_block(&block, 3);
 
     _pdos_close_fs();
 }
@@ -51,4 +61,8 @@ void _pdos_close_fs() {
 	if (pdos_fs) {
 	    munmap(pdos_fs, BLOCK_SIZE * MAXBLOCKS);
 	}
+}
+
+void _pdos_write_block(DISK_BLOCK* block, int block_num) {
+    memcpy(pdos_fs + block_num, block, sizeof(DISK_BLOCK));
 }
