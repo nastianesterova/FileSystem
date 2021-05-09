@@ -16,5 +16,6 @@ void pdos_mkdir(char *dir);
 DISK_BLOCK* _pdos_open_fs();
 void _pdos_close_fs();
 void _pdos_write_block(DISK_BLOCK* block, int block_num);
+void _pdos_read_block(DISK_BLOCK* block, int block_num);
 
 #endif

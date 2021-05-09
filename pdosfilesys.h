@@ -40,7 +40,7 @@
  */
 
 typedef struct direntry {
-	char 	isdir;			// ture if this entry is a directory entry (used for sub directory)
+	char 	isdir;			// true if this entry is a directory entry (used for sub directory)
 	time_t	filemodtime;	// last time file was access
 	
     int     filelength ;	// length of file in bytes
@@ -51,7 +51,7 @@ typedef struct direntry {
 #define MAX_NUM_DIRECTORIES_ENTRIES ((BLOCK_SIZE - (2 * sizeof(int)) ) / sizeof(DIR_ENTRY))
 /*
  * Directoy Block, occupies a whole disk block
- * Every file system must have at lease one of these, which is the
+ * Every file system must have at least one of these, which is the
  * root directory.
  * An empty root directory will have this with its nextentry = 0;
  */

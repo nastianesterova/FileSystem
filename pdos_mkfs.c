@@ -66,3 +66,10 @@ void _pdos_close_fs() {
 void _pdos_write_block(DISK_BLOCK* block, int block_num) {
     memcpy(pdos_fs + block_num, block, sizeof(DISK_BLOCK));
 }
+
+// params:
+// block: into which you will read a block
+// block_num: number of block in disk that you read from
+void _pdos_read_block(DISK_BLOCK* block, int block_num) {
+    memcpy(block, pdos_fs + block_num, sizeof(DISK_BLOCK));
+}

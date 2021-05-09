@@ -13,7 +13,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "pdosfilesys.h"
+#include "pdos.h"
 /*
  * 
  */
@@ -25,18 +25,20 @@ int main(int argc, char** argv) {
 
     // open file for read/writing
     fd = pdos_open("file1.txt", "rw");
+    if (!fd) {
+        fprintf(stderr, "Cannot open file\n");
+    }
     
     
     int charValue = 'A';  // Letter A
-    int rtn = 0;
-    for(int i = 0; i < BLOCKSIZE -1; i++, charValue++){
+    for(int i = 0; i < BLOCK_SIZE - 1; i++, charValue++){
 		if (charValue > 'Z')
 			charValue = 'A';
-        rtn = pdos_fputc(charValue, fd);
+        pdos_fputc(charValue, fd);
     }
     
     // close file
-    pdos_close(fd);
+    pdos_fclose(fd);
    
  
  /**/
