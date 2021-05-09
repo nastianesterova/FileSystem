@@ -7,13 +7,15 @@
 #include <sys/types.h>
 #include "pdos.h"
 
-/*
-Creates disk of size sz
-Normally 1024 blocks
-*/
+/**
+ * Create shared memory of sz bytes
+ * 
+ * 
+ **/
+
 void pdos_mkdisk(int sz) {
 	printf("pdos_mkdisk running\n");
-	int fd = shm_open("MYFS", O_RDWR | O_CREAT, 0777); //0777 is for permissions
+	int fd = shm_open("MYFS", O_RDWR | O_CREAT | O_TRUNC, 0777); //0777 is for permissions
 	if(fd == -1) {
 		printf("File failed to open.\n");
 		exit(-1);	

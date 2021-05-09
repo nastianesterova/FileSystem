@@ -6,6 +6,6 @@
 int main() {
 	printf("Making disk\n");
 	pdos_mkdisk(10);
-	printf("Made disk\n");
+	printf("Made disk of size: %d\n", );
 	return 0;
 }
