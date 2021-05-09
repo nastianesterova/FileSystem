@@ -24,17 +24,4 @@ void pdos_mkdisk(int sz) {
 		exit(-1);
 	}
 }
-
-DISK_BLOCK* _pdos_open_disk() {
-	int fd = open(MYFS, O_RDWR);
-    void* disk = mmap(0, BLOCK_SIZE * MAXBLOCKS, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-    if(disk == (void *) -1) {
-        perror("Failed to open disk.");
-        exit(-1);
-    }
-	return (DISK_BLOCK*) disk;
-}
-
-void _pdos_close_disk(DISK_BLOCK* disk_start) {
-	    munmap(disk_start, BLOCK_SIZE * MAXBLOCKS);
-}
+ 

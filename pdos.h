@@ -13,7 +13,7 @@ char **pdos_dir();
 void pdos_mkdir(char *dir);
 
 //extra functions
-DISK_BLOCK* _pdos_open_disk();
-void _pdos_close_disk(DISK_BLOCK* disk_start);
+DISK_BLOCK* _pdos_open_fs();
+void _pdos_close_fs();
 
 #endif
