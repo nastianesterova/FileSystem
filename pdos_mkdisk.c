@@ -14,11 +14,13 @@
  **/
 
 void pdos_mkdisk(int sz) {
-	printf("pdos_mkdisk running\n");
-	int fd = shm_open("MYFS", O_RDWR | O_CREAT | O_TRUNC, 0777); //0777 is for permissions
+	int fd = shm_open("MYFS", O_RDWR | O_CREAT | O_TRUNC, S_IRWXU | S_IRWXG | S_IRWXO); // permit all
 	if(fd == -1) {
-		printf("File failed to open.\n");
+		perror("Failed to open or create shared memory MYFS");
 		exit(-1);	
 	}	
-	ftruncate(fd, sz);
+	if (-1 == ftruncate(fd, sz)) {
+		fprintf(stderr, "Failed to set shared memory to size %d: %s", sz, strerror(errno));
+		exit(-1);
+	}
 }

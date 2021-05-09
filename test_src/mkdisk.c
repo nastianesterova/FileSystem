@@ -1,11 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "/home/cosc255/FINAL/pdos.h"
+#include "pdos.h"
 
-//create a disk (MYFS) in dev/shm
+//create a disk (MYFS) in dev/shm on 1024 blocks
 int main() {
-	printf("Making disk\n");
-	pdos_mkdisk(10);
-	printf("Made disk of size: %d\n", );
+	long sz = BLOCK_SIZE * MAXBLOCKS;
+	printf("Making disk of size %ld\n", sz);
+	pdos_mkdisk(sz);
+	struct stat buffer;
+	int fd = open(MYFS, O_RDONLY);
+	fstat(fd, &buffer);
+	printf("Size of MYFS disk: %ld\n", buffer.st_size);
 	return 0;
 }

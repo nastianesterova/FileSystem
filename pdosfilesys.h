@@ -118,4 +118,5 @@ typedef struct FILE_DESCRIPTOR{
  *  PDOS_FILE * pdos_open(const char *filename, const char *mode);
  *  . . . 
  */
+#define MYFS "/dev/shm/MYFS"
 #endif /* PDOSFILESYS_H */
