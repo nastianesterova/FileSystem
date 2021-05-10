@@ -120,6 +120,4 @@ typedef struct FILE_DESCRIPTOR{
  */
 #define MYFS "/dev/shm/MYFS"
 
-extern DISK_BLOCK* pdos_fs;
-
 #endif /* PDOSFILESYS_H */

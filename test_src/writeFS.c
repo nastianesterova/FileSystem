@@ -21,12 +21,16 @@ int main(int argc, char** argv) {
   
    
     PDOS_FILE *fd = NULL;
-    
+    char * fname = "file1.txt";
+    if (argc > 1) {
+        fname = argv[1];
+    }
 
     // open file for read/writing
-    fd = pdos_open("file1.txt", "rw");
+    fd = pdos_open(fname, "rw");
     if (!fd) {
-        fprintf(stderr, "Cannot open file\n");
+        fprintf(stderr, "Cannot open file %s\n", fname);
+        exit(-1);
     }
     
     

@@ -8,7 +8,7 @@
  * data blocks (initially -1)
 **/
 
-DISK_BLOCK* pdos_fs = 0;
+static DISK_BLOCK* pdos_fs = 0;
 
 void pdos_mkfs(char * ID) {
     _pdos_open_fs();
