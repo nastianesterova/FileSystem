@@ -6,6 +6,10 @@ PDOS_FILE *pdos_open(const char *fname, const char *mode) {
         fprintf(stderr, "Invalid file mode.\n");
         exit(-1);
     }
+    if (strlen(fname) >= MAXNAME) {
+        fprintf(stderr, "Invalid FAT file name.\n");
+        exit(-1);
+    }
     _pdos_open_fs();
     // open fs, look for fname in directory block pdos_fs + 3
     DISK_BLOCK dir_block;
@@ -18,43 +22,34 @@ PDOS_FILE *pdos_open(const char *fname, const char *mode) {
                 // file has been found
                 // open file for r, w or rw
                 // if w, delete file and exit loop
+                int load_data_buffer = 1; // load by default
                 if(strcmp(mode, "w") == 0) {
                     // File needs to be truncated to 0 size
                     // set FAT table entries to -1 except the first, which will be set to 0
+                    // we read both fat blocks and save them later back to fs.
+                    load_data_buffer = 0; // no need to load data for 0 size file.
                     DISK_BLOCK fat_block[2];
-                    int second_loaded = 0;
-                    short fat_index = dir_block.dir.dir_entry_list[i].filefirstblock;
-                    if(fat_index < BLOCK_SIZE / 2) {
-                        // first FAT aka block index 1 on disk
-                        _pdos_read_block(&fat_block[0], 1);
-                        while(fat_index < BLOCK_SIZE / 2) {
-                            short next_index = fat_block[0].fat[fat_index];
-                            fat_block[0].fat[fat_index] = -1;
-                            fat_index = next_index;
-                            if(fat_index == 0) break;
+                    _pdos_read_block(&fat_block[0], 1);
+                    _pdos_read_block(&fat_block[1], 2);                    
+                    short first_fat_index = dir_block.dir.dir_entry_list[i].filefirstblock;
+                    // loop over fat_index to free all blocks in fat table.
+                    short fat_index = first_fat_index;
+                    while(fat_index < MAXBLOCKS && fat_index != 0) {
+                        int block_index = fat_index / (BLOCK_SIZE / 2);
+                        int entry_index = fat_index % (BLOCK_SIZE / 2);
+                        short next_index = fat_block[block_index].fat[entry_index];
+                        if (fat_index == first_fat_index) {
+                            fat_block[block_index].fat[entry_index] = 0; // do not free first block
+                        } else {
+                            fat_block[block_index].fat[entry_index] = -1; // 0 in first iteration, otherwise -1
                         }
+                        fat_index = next_index;
                     }
-                    if(fat_index >= BLOCK_SIZE / 2) {
-                        second_loaded = 1;
-                        _pdos_read_block(&fat_block[1], 2);
-                        while(fat_index < BLOCK_SIZE) {
-                            short next_index = fat_block[1].fat[fat_index];
-                            fat_block[1].fat[fat_index] = -1;
-                            fat_index = next_index;
-                            if(fat_index == 0) break;
-                        }
-                    }
-                    if(dir_block.dir.dir_entry_list[i].filefirstblock < BLOCK_SIZE / 2) {
-                        fat_block[0].fat[dir_block.dir.dir_entry_list[i].filefirstblock] = 0;
-                        _pdos_write_block(&fat_block[0], 1);
-                        if(second_loaded) {
-                            _pdos_write_block(&fat_block[1], 2);
-                        }
-                    }
-                    else {
-                        fat_block[1].fat[dir_block.dir.dir_entry_list[i].filefirstblock - BLOCK_SIZE / 2] = 0;
-                        _pdos_write_block(&fat_block[1], 2);
-                    }
+                    // save fat blocks as they were changed
+                    _pdos_write_block(&fat_block[0], 1);
+                    _pdos_write_block(&fat_block[1], 2);
+
+                    // directory block was also changed
                     dir_block.dir.dir_entry_list[i].filelength = 0;
                     dir_block.dir.dir_entry_list[i].filemodtime = time(NULL);
                     _pdos_write_block(&dir_block, 3);
@@ -65,7 +60,9 @@ PDOS_FILE *pdos_open(const char *fname, const char *mode) {
                 file->blocknum = dir_block.dir.dir_entry_list[i].filefirstblock;
                 file->entrylistIdx = i;
                 // must copy data from disk into buffer
-                _pdos_read_block(&file->buffer, file->blocknum);
+                if (load_data_buffer) {
+                    _pdos_read_block(&file->buffer, file->blocknum);
+                }
                 return file;
             }
         }
@@ -106,7 +103,7 @@ PDOS_FILE *pdos_open(const char *fname, const char *mode) {
     dir_entry->filemodtime = time(NULL);
     dir_entry->filelength = 0;
     dir_entry->filefirstblock = first_free_block;
-    strncpy(dir_entry->name, fname, MAXNAME);
+    strcpy(dir_entry->name, fname);
     _pdos_write_block(&dir_block, 3);
 
     PDOS_FILE* file = malloc(sizeof(PDOS_FILE)); // must free in pdos_fclose
