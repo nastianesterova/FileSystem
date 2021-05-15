@@ -42,8 +42,7 @@
 typedef struct direntry {
 	char 	isdir;			// true if this entry is a directory entry (used for sub directory)
 	time_t	filemodtime;	// last time file was access
-	
-    int     filelength ;	// length of file in bytes
+	int     filelength ;	// length of file in bytes
 	short	filefirstblock;	// FAT index for this file
 	char	name[MAXNAME];	// file name
 } DIR_ENTRY;
