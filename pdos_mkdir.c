@@ -12,7 +12,8 @@ void pdos_mkdir(char *dir) {
     // open fs, look for dir in directory block. If found cannot create directory
     _pdos_open_fs();
     DISK_BLOCK dir_block;
-    _pdos_read_block(&dir_block, 3);
+    int dir_block_idx = 3;
+    _pdos_read_block(&dir_block, dir_block_idx);
     for(int i = 0; i < dir_block.dir.nextEntry; ++i) {
         if(dir_block.dir.dir_entry_list[i].isdir) {
             if(strcmp(dir_block.dir.dir_entry_list[i].name, dir) == 0) {
@@ -63,5 +64,5 @@ void pdos_mkdir(char *dir) {
     dir_entry->filelength = 0;
     dir_entry->filefirstblock = free_block;
     strcpy(dir_entry->name, dir);
-    _pdos_write_block(&dir_block, 3);
+    _pdos_write_block(&dir_block, dir_block_idx);
 }
