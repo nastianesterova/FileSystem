@@ -19,7 +19,8 @@
  */
 int main(int argc, char** argv) {
   
-   
+    pdos_mkdir("directory");
+
     PDOS_FILE *fd = NULL;
     char * fname = "file1.txt";
     if (argc > 1) {
@@ -43,7 +44,6 @@ int main(int argc, char** argv) {
     
     // close file
     pdos_fclose(fd);
-   
  
  /**/
     return (EXIT_SUCCESS);
