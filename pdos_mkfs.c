@@ -9,7 +9,7 @@
  * FAT block
  * FAT block
  * --------
- * directory block
+ * root directory block
  * --------
  * data blocks
  * .....
