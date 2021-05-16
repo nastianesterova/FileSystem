@@ -18,10 +18,10 @@ void pdos_mkdisk(int sz) {
 	if(fd == -1) {
 		perror("Failed to open or create shared memory MYFS");
 		exit(-1);	
-	}	
+	}
+	// reserve shared memory of size sz by calling truncate
 	if (-1 == ftruncate(fd, sz)) {
 		fprintf(stderr, "Failed to set shared memory to size %d: %s", sz, strerror(errno));
 		exit(-1);
 	}
 }
- 

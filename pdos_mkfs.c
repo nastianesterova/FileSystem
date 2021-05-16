@@ -2,10 +2,23 @@
 
 /**
  * formats in-memory FS
+ * First four blocks responsible for management of files
+ * -------- start of disk
  * 1st block reserved, contains ID string
- * 2 FAT blocks
+ * --------
+ * FAT block
+ * FAT block
+ * --------
  * directory block
- * data blocks (initially -1)
+ * --------
+ * data blocks
+ * .....
+ * -------- end of disk
+ * 
+ * FAT block data entries are short (2 bytes)
+ * initialized to 0 2 0 0 -1 -1 ...
+ * Directory block has first entry - root directory,
+ * with is_dir byte set to 1, rest are 0's.
 **/
 
 static DISK_BLOCK* pdos_fs = 0;
@@ -63,6 +76,9 @@ void _pdos_close_fs() {
 	}
 }
 
+// simulates writing block of data to the disk
+// block: block which you will write to disk
+// block_num: block # on disk into which you will write to
 void _pdos_write_block(DISK_BLOCK* block, int block_num) {
     memcpy(pdos_fs + block_num, block, sizeof(DISK_BLOCK));
 }
