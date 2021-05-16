@@ -53,7 +53,7 @@ DISK_BLOCK* _pdos_open_fs() {
         perror("Failed to open disk.");
         exit(-1);
     }
-	pdos_fs = (DISK_BLOCK*)disk;
+	pdos_fs = (DISK_BLOCK*)disk; //cast to disk block
 	return pdos_fs;
 }
 
