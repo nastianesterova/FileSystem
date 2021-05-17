@@ -89,3 +89,19 @@ void _pdos_write_block(DISK_BLOCK* block, int block_num) {
 void _pdos_read_block(DISK_BLOCK* block, int block_num) {
     memcpy(block, pdos_fs + block_num, sizeof(DISK_BLOCK));
 }
+
+// This function will return the state of the block
+// from fat table (2 FAT blocks)
+// param fat_blocks is array of 2 FAT blocks.
+short _pdos_get_block_state(DISK_BLOCK* fat_blocks, int block_num) {
+    int block_index = block_num / (BLOCK_SIZE / 2);
+    int entry_index = block_num % (BLOCK_SIZE / 2);
+    return fat_blocks[block_index].fat[entry_index];
+}
+
+// opposite of get.
+void _pdos_set_block_state(DISK_BLOCK* fat_blocks, int block_num, short state) {
+    int block_index = block_num / (BLOCK_SIZE / 2);
+    int entry_index = block_num % (BLOCK_SIZE / 2);
+    fat_blocks[block_index].fat[entry_index] = state;
+}

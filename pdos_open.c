@@ -28,26 +28,24 @@ PDOS_FILE *pdos_open(const char *fname, const char *mode) {
                     // set FAT table entries to -1 except the first, which will be set to 0
                     // we read both fat blocks and save them later back to fs.
                     load_data_buffer = 0; // no need to load data for 0 size file.
-                    DISK_BLOCK fat_block[2];
-                    _pdos_read_block(&fat_block[0], 1);
-                    _pdos_read_block(&fat_block[1], 2);                    
+                    DISK_BLOCK fat_blocks[2];
+                    _pdos_read_block(&fat_blocks[0], 1);
+                    _pdos_read_block(&fat_blocks[1], 2);                    
                     short first_fat_index = dir_block.dir.dir_entry_list[i].filefirstblock;
                     // loop over fat_index to free all blocks in fat table.
                     short fat_index = first_fat_index;
                     while(fat_index < MAXBLOCKS && fat_index != 0) {
-                        int block_index = fat_index / (BLOCK_SIZE / 2);
-                        int entry_index = fat_index % (BLOCK_SIZE / 2);
-                        short next_index = fat_block[block_index].fat[entry_index];
+                        short next_index = _pdos_get_block_state(fat_blocks, fat_index);
                         if (fat_index == first_fat_index) {
-                            fat_block[block_index].fat[entry_index] = 0; // do not free first block
+                            _pdos_set_block_state(fat_blocks, fat_index, 0); // do not free first block
                         } else {
-                            fat_block[block_index].fat[entry_index] = -1; // 0 in first iteration, otherwise -1
+                            _pdos_set_block_state(fat_blocks, fat_index, -1); // 0 in first iteration, otherwise -1
                         }
                         fat_index = next_index;
                     }
                     // save fat blocks as they were changed
-                    _pdos_write_block(&fat_block[0], 1);
-                    _pdos_write_block(&fat_block[1], 2);
+                    _pdos_write_block(&fat_blocks[0], 1);
+                    _pdos_write_block(&fat_blocks[1], 2);
 
                     // directory block was also changed
                     dir_block.dir.dir_entry_list[i].filelength = 0;
@@ -77,24 +75,22 @@ PDOS_FILE *pdos_open(const char *fname, const char *mode) {
     if(dir_block.dir.nextEntry == MAX_NUM_DIRECTORIES_ENTRIES) return NULL;
     // if there is space, need to still check if there is space on the disk
     // need to check for available entries through FAT table
-    DISK_BLOCK fat_block[2];
-    _pdos_read_block(&fat_block[0], 1);
-    _pdos_read_block(&fat_block[1], 2);
+    DISK_BLOCK fat_blocks[2];
+    _pdos_read_block(&fat_blocks[0], 1);
+    _pdos_read_block(&fat_blocks[1], 2);
     int first_free_block = 0;
     for(int i = 4; i < MAXBLOCKS; ++i) {
-        int block_index = i / (BLOCK_SIZE / 2);
-        int entry_index = i % (BLOCK_SIZE / 2);
-        if(fat_block[block_index].fat[entry_index] == -1) {
+        if(_pdos_get_block_state(fat_blocks, i) == -1) {
             first_free_block = i;
             break;
         }
     }
     if(!first_free_block) return NULL; // no free blocks to add file to
     // set first free block in FATs to 0
-    int free_fat_block_idx = first_free_block / (BLOCK_SIZE / 2);
-    int free_fat_entry_idx = first_free_block % (BLOCK_SIZE / 2);
-    fat_block[free_fat_block_idx].fat[free_fat_entry_idx] = 0;
-    _pdos_write_block(&fat_block[free_fat_block_idx], free_fat_block_idx + 1);
+    _pdos_set_block_state(fat_blocks, first_free_block, 0);
+    // write fat to disk
+    _pdos_write_block(&fat_blocks[0], 1);
+    _pdos_write_block(&fat_blocks[1], 2);
 
     // there is space to add the file
     DIR_ENTRY* dir_entry = &dir_block.dir.dir_entry_list[dir_block.dir.nextEntry];
@@ -104,6 +100,7 @@ PDOS_FILE *pdos_open(const char *fname, const char *mode) {
     dir_entry->filelength = 0;
     dir_entry->filefirstblock = first_free_block;
     strcpy(dir_entry->name, fname);
+    // write dir block to disk
     _pdos_write_block(&dir_block, 3);
 
     PDOS_FILE* file = malloc(sizeof(PDOS_FILE)); // must free in pdos_fclose

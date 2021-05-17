@@ -9,23 +9,20 @@ void pdos_fclose(PDOS_FILE * file) {
             DISK_BLOCK fat_blocks[2];
             _pdos_read_block(&fat_blocks[0], 1);
             _pdos_read_block(&fat_blocks[1], 2);
-            int current_block_fat_index = file->blocknum / (BLOCK_SIZE / 2);
-            int current_block_fat_entry_index = file->blocknum % (BLOCK_SIZE / 2);
 
             DISK_BLOCK dir_block;
             _pdos_read_block(&dir_block, 3);
             // if this one is the last block for the file, we need to update file size
             // in the directory entry
-            if (fat_blocks[current_block_fat_index].fat[current_block_fat_entry_index] == 0) {
+            int state = _pdos_get_block_state(fat_blocks, file->blocknum);
+            if (state == 0) {
                 // This was the last block
                 // we count all blocks from the beginning except last
                 int blocknum = dir_block.dir.dir_entry_list[file->entrylistIdx].filefirstblock;
                 int filesize = 0;
                 while (blocknum != file->blocknum) {
                     filesize += BLOCK_SIZE;
-                    int fat_index = blocknum % (BLOCK_SIZE / 2);
-                    int fat_entry_index = blocknum ;
-                    blocknum = fat_blocks[fat_index].fat[fat_entry_index]; // next block
+                    blocknum = _pdos_get_block_state(fat_blocks, blocknum); // next block
                 }
                 filesize += file->pos;
                 // for "rw" mode the filelength can finish past the current position (for ex reading

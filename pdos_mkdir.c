@@ -33,14 +33,12 @@ void pdos_mkdir(char *dir) {
 
     // if there is space in dir block, need to still check if there is space on the disk
     // need to check for available entries through FAT table
-    DISK_BLOCK fat_block[2];
-    _pdos_read_block(&fat_block[0], 1);
-    _pdos_read_block(&fat_block[1], 2);
+    DISK_BLOCK fat_blocks[2];
+    _pdos_read_block(&fat_blocks[0], 1);
+    _pdos_read_block(&fat_blocks[1], 2);
     int free_block = 0;
     for(int i = 4; i < MAXBLOCKS; ++i) {
-        int block_index = i / (BLOCK_SIZE / 2);
-        int entry_index = i % (BLOCK_SIZE / 2);
-        if(fat_block[block_index].fat[entry_index] == -1) {
+        if (_pdos_get_block_state(fat_blocks, i) == -1) {
             free_block = i;
             break;
         }
@@ -51,10 +49,10 @@ void pdos_mkdir(char *dir) {
     }
 
     // set free block in FATs to 0
-    int free_fat_block_idx = free_block / (BLOCK_SIZE / 2);
-    int free_fat_entry_idx = free_block % (BLOCK_SIZE / 2);
-    fat_block[free_fat_block_idx].fat[free_fat_entry_idx] = 0;
-    _pdos_write_block(&fat_block[free_fat_block_idx], free_fat_block_idx + 1);
+    _pdos_set_block_state(fat_blocks, free_block, 0);
+    // write fat back to disk
+    _pdos_write_block(&fat_blocks[0], 1);
+    _pdos_write_block(&fat_blocks[1], 2);
 
     // there is space to add the sub directory
     DIR_ENTRY* dir_entry = &dir_block.dir.dir_entry_list[dir_block.dir.nextEntry];
@@ -64,5 +62,6 @@ void pdos_mkdir(char *dir) {
     dir_entry->filelength = 0;
     dir_entry->filefirstblock = free_block;
     strcpy(dir_entry->name, dir);
+    // write dir block back to disk
     _pdos_write_block(&dir_block, dir_block_idx);
 }
