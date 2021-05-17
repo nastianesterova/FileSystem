@@ -35,7 +35,10 @@ int main(int argc, char** argv) {
     int numchars = BLOCK_SIZE - 1;
     if (argc > 2) {
         // if extra argument is 0 - write 1023 bytes, if 1 - write 1024 bytes
-        if (argv[2][0] == '1') {
+        if (argv[2][0] == '0') {
+            numchars = BLOCK_SIZE - 1;
+        }
+        else if (argv[2][0] == '1') {
             numchars = BLOCK_SIZE;
         }
     }
@@ -45,7 +48,7 @@ int main(int argc, char** argv) {
             // expand file by reading to the end and then writing
             int charInFile = pdos_fgetc(fd);
             while (charInFile != -1) {
-                charValue = charInFile;
+                charValue = charInFile + 1;
                 charInFile = pdos_fgetc(fd);
             }
         }
