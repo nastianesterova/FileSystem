@@ -9,17 +9,27 @@ C_FLAGS = -std=c11 -Wall -D_XOPEN_SOURCE=700
 tempdirs = $(OBJ_DIR) $(LIB_DIR)
 
 lib_c_files = pdos_fgetc.c pdos_fputc.c pdos_mkdisk.c pdos_mkfs.c pdos_open.c pdos_fclose.c pdos_dir.c pdos_mkdir.c
+# substitutes .c files and path with .o for all files listed in lib_c_files
 lib_obj_files = $(patsubst %.c,$(OBJ_DIR)/%.o,$(lib_c_files))
 
+# $@ is the name of the target being generated
+# $< is the first prerequesite
+# below code can be translated to
+# ./obj/pdos_fgetc.o: pdos_fgetc.c
+#		gcc -c -std=c11 -Wall -D_XOPEN_SOURCE=700 -o ./obj/pdos_fgetc.o pdos_fgetc.c
 $(OBJ_DIR)/%.o: %.c
 	gcc -c $(C_FLAGS) -o $@ $<
 
+# ./lib/libPseudoFS.a: pdos_fgetc.o
+#	ar rc -s ./lib/libPseudoFS.a pdos_fgetc.o
 $(LIB_DIR)/libPseudoFS.a: $(lib_obj_files)
 	ar rc -s $(LIB_DIR)/libPseudoFS.a $(lib_obj_files)
 
+# creates subdirectory ./obj if it doesn't exist
 $(OBJ_DIR): 
 	@mkdir -p $(OBJ_DIR)
 
+# creates subdirectory ./lib if it doesn't exist
 $(LIB_DIR):
 	@mkdir -p $(LIB_DIR)
 
