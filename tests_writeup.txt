@@ -18,8 +18,8 @@ write_file.c takes several parameters:
 1. filename
 2. int to indicate how many bytes to write to file (0 = 1023 bytes, 1 = 1024 bytes)
 instructions to run this test:
-    ./write_file.c file1.txt    //will write 1023 bytes A-Z
-    ./write_file.c file1.txt 1  //will write 1024 bytes A-Z
+    ./write_file file1.txt    //will write 1023 bytes A-Z
+    ./write_file file1.txt 1  //will write 1024 bytes A-Z
 
 d. One that reads in the data from above file and prints it out ensuring it matches
 can use either print_file.c or read_from_file.c
@@ -31,22 +31,22 @@ read_from_file.c:
         if there were no mismatches, prints success messages
         if an error was found, prints what the mismatch was and returns -1
 instructions to run this test:
-    ./read_from_file.c file1.txt
+    ./read_from_file file1.txt
 
 e. Repeat (c), this time create a second file file2.txt after (i). Now expand the original (file1.txt) file
 by writing out another 1024 bytes.
 instructions to run this test:
-    ./write_file.c file2.txt    //creates file2.txt and fills with 1023 bytes
-    ./write_file.c file1.txt 1 expand   //expands file1.txt with 1024 bytes (to expand needs to read file
+    ./write_file file2.txt    //creates file2.txt and fills with 1023 bytes
+    ./write_file file1.txt 1 expand   //expands file1.txt with 1024 bytes (to expand needs to read file
     so that pos is at end of file, and also finds the last char so it continues writing from the char in
     alphabet from which it left off)
 
 
 f. Print out the contents of file1.txt and file2.txt
 instructions to run this test:
-    ./print_file.c file1.txt
-    ./print_file.c file2.txt
+    ./print_file file1.txt
+    ./print_file file2.txt
 
 g. Does directory listing of root directory
 instructions to run this test:
-    ./list_dir.c
+    ./list_dir
