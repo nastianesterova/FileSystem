@@ -1,0 +1,52 @@
+Set of c programs to execute each function
+
+a. One that creates a disk file system and shows that it is the correct size
+mkdisk.c calls pdos_mkdisk, passing it the size of the disk described in project description.
+Uses stat struct to print size of memory.
+instructions to run this test:
+    ./mkdisk
+
+b. One that formats and initializes the disk by writing the FS structure
+mkfs.c can take an ID string as a parameter, but also has default ID which it pases into pdos_mkfs
+to initialize the file system.
+instructions to run this test:
+    ./mkfs
+
+c. One that uses the above FS and creates a test file (file1.txt) in the root directory.
+Writes out 1023 bytes of A-Z repeatedly. Writes out 1024 bytes of A-Z repeatedly.
+write_file.c takes several parameters:
+1. filename
+2. int to indicate how many bytes to write to file (0 = 1023 bytes, 1 = 1024 bytes)
+instructions to run this test:
+    ./write_file.c file1.txt    //will write 1023 bytes A-Z
+    ./write_file.c file1.txt 1  //will write 1024 bytes A-Z
+
+d. One that reads in the data from above file and prints it out ensuring it matches
+can use either print_file.c or read_from_file.c
+read_from_file.c:
+    parameters:
+        filename
+    what it does:
+        reads from file "filename" and compares each byte to characters A-Z in a loop until EOF is reached
+        if there were no mismatches, prints success messages
+        if an error was found, prints what the mismatch was and returns -1
+instructions to run this test:
+    ./read_from_file.c file1.txt
+
+e. Repeat (c), this time create a second file file2.txt after (i). Now expand the original (file1.txt) file
+by writing out another 1024 bytes.
+instructions to run this test:
+    ./write_file.c file2.txt    //creates file2.txt and fills with 1023 bytes
+    ./write_file.c file1.txt 1 expand   //expands file1.txt with 1024 bytes (to expand needs to read file
+    so that pos is at end of file, and also finds the last char so it continues writing from the char in
+    alphabet from which it left off)
+
+
+f. Print out the contents of file1.txt and file2.txt
+instructions to run this test:
+    ./print_file.c file1.txt
+    ./print_file.c file2.txt
+
+g. Does directory listing of root directory
+instructions to run this test:
+    ./list_dir.c
