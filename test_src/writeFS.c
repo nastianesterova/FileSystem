@@ -32,14 +32,21 @@ int main(int argc, char** argv) {
         exit(-1);
     }
     
-    
-    int charValue = 'A';  // Letter A
-    for(int i = 0; i < BLOCK_SIZE - 1; i++, charValue++){
-		if (charValue > 'Z')
-			charValue = 'A';
-        pdos_fputc(charValue, fd);
+    if(argc > 2) {
+        int i = 0;
+        while(argv[2][i]) {
+            pdos_fputc(argv[2][i], fd);
+            ++i;
+        }
     }
-    
+    else {
+        int charValue = 'A';  // Letter A
+        for(int i = 0; i < BLOCK_SIZE - 1; i++, charValue++){
+            if (charValue > 'Z')
+                charValue = 'A';
+            pdos_fputc(charValue, fd);
+        }
+    }
     // close file
     pdos_fclose(fd);
  

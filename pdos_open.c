@@ -70,7 +70,7 @@ PDOS_FILE *pdos_open(const char *fname, const char *mode) {
 
     // if file is not found and must be opened for writing or rw, create it
     // TODO: create only for w or rw?
-    if(strcmp(mode, "r") == 0) {
+    if(strcmp(mode, "r") == 0 || strcmp(mode, "rw")) {
         return NULL;
     }
     // if there is no space in dir block, return null
