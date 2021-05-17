@@ -21,20 +21,24 @@ int main(int argc, char** argv) {
   
     PDOS_FILE *fd = NULL;
     char * fname = "file1.txt";
+    char * mode = "rw";
     if (argc > 1) {
         fname = argv[1];
     }
+    if (argc > 2) {
+        mode = argv[2];
+    }
 
     // open file for read/writing
-    fd = pdos_open(fname, "rw");
+    fd = pdos_open(fname, mode);
     if (!fd) {
-        fprintf(stderr, "Cannot open file %s\n", fname);
+        fprintf(stderr, "Cannot open file %s mode '%s'\n", fname, mode);
         exit(-1);
     }
     
-    if(argc > 2) {
+    if(argc > 3) {
         int i = 0;
-        while(argv[2][i]) {
+        while(argv[3][i]) {
             pdos_fputc(argv[2][i], fd);
             ++i;
         }

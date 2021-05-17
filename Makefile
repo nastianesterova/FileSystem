@@ -23,7 +23,7 @@ $(OBJ_DIR):
 $(LIB_DIR):
 	@mkdir -p $(LIB_DIR)
 
-test_programs = mkdisk mkfs writeFS list_dir make_dir
+test_programs = mkdisk mkfs write_file read_from_file list_dir make_dir 
 
 all_tests: $(test_programs)
 
@@ -33,7 +33,10 @@ mkdisk: test_src/mkdisk.c $(LIB_DIR)/libPseudoFS.a
 mkfs: test_src/mkfs.c $(LIB_DIR)/libPseudoFS.a
 	gcc $(C_FLAGS) -I. -o $@ $< $(LIB_DIR)/libPseudoFS.a -lrt
 
-writeFS: test_src/writeFS.c $(LIB_DIR)/libPseudoFS.a
+write_file: test_src/write_file.c $(LIB_DIR)/libPseudoFS.a
+	gcc $(C_FLAGS) -I. -o $@ $< $(LIB_DIR)/libPseudoFS.a -lrt
+
+read_from_file: test_src/read_from_file.c $(LIB_DIR)/libPseudoFS.a
 	gcc $(C_FLAGS) -I. -o $@ $< $(LIB_DIR)/libPseudoFS.a -lrt
 
 list_dir: test_src/list_dir.c $(LIB_DIR)/libPseudoFS.a

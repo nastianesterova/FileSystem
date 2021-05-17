@@ -36,7 +36,7 @@ int pdos_fgetc(PDOS_FILE * file) {
         }
         fileoffset += file->pos; // for current block add pos.
         // if offset past end of file, we cannot read.
-        if (fileoffset > dir_block.dir.dir_entry_list[file->entrylistIdx].filelength) {
+        if (fileoffset >= dir_block.dir.dir_entry_list[file->entrylistIdx].filelength) {
             return -1; // as in fgetc() documentation
         }
     }
@@ -48,5 +48,7 @@ int pdos_fgetc(PDOS_FILE * file) {
         _pdos_read_block(&file->buffer, file->blocknum);
     }
 
-    return file->buffer.data[file->pos];
+    int c = file->buffer.data[file->pos];
+    ++file->pos;
+    return c;
 }

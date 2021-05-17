@@ -2,33 +2,36 @@
 #include <stdlib.h>
 #include "pdos.h"
 
-// not really sure how the file is passed in here. Or do we just run the WriteFS in this function?
-// also this is pretty crappy but I think it may be the gist
 
 int main(int argc, char** argv) 
 {
-    // not sure how we get the file, maybe passed in?
-    // maybe this
-    //char * fname = argv[1]; 
+    char * fname = argv[1]; 
     
     PDOS_FILE * file_in_system = pdos_open(fname, "r");
     
-    // then loop through the file presumably and compare? (not sure what to compare to, maybe just the raw letters?)
-    // need to somehow also get file size
+    // then loop through the file and compare
     
     int charValue = 'A';  // Letter A
-    for(int i = 0; i < file_sz - 1; i++, charValue++)
+    int i = 0;
+    for(; i < BLOCK_SIZE * MAXBLOCKS; i++, charValue++)
     {
-		    if (charValue > 'Z')
-			      charValue = 'A';
-        if (pdos_fgetc(file_in_system) != charValue)
+		if (charValue > 'Z')
         {
-            printf("file not entered intot the FS correctly);
-            return 0;
+			charValue = 'A';
         }
-        printf("expected char: %c, Char in File: %c\n", charValue, (pdos_fgetc(file_in_system));
-        // somehow advance the file_in_system ptr 
+        int charInFile = pdos_fgetc(file_in_system);
+        if (charInFile == -1) break; // End of file
+        if (charInFile != charValue)
+        {
+            printf("expected char: %c, Char in File: %c position %d\n", charValue, charInFile, i);
+            printf("file not entered into the FS correctly\n");
+            return -1;
+        }
+        // somehow advance the file_in_system ptr - it advance automatically 
     }
+    printf("compared %d bytes. success\n", i);
+    return 0;
+}
 
 
     
